@@ -2,8 +2,8 @@ import torch
 import numpy as np
 from torch import nn
 from einops.layers.torch import Rearrange
-from timm.models.layers import trunc_normal_
-from timm.models.layers import DropPath, Mlp
+from timm.layers import trunc_normal_
+from timm.layers import DropPath, Mlp
 
 class TopM_MHSA(nn.Module):
     def __init__(self, embed_dim, num_heads, num_mhsa_layers, dim_feedforward, dropout, top_m):
