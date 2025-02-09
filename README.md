@@ -44,14 +44,9 @@ python exp/dataset_process/dataset_split.py --dataset closed_2tab --use_stratify
 
 ### Training \& Evaluation
 
-Run the codes
-
+1. Make feature datasets
 ```sh
-for num_tabs in 2 3 4 5
-do
-  for scenario in closed open
-    do
-      dataset=${scenario}_${num_tabs}tab
+dataset=closed_2tab # change the dataset name accordingly(closed_3tab,open_3tab...etc)
 
       for filename in train valid test
       do 
@@ -60,26 +55,42 @@ do
             --seq_len 10000 \
             --in_file ${filename}
       done
+```
+2. Train the model
+```sh
+scenario="closed/open"  #select the scenario of dataset open or closed
+num_tabs="2/3/4/5" #select the number of tabs
 
-      python -u exp/train.py \
-        --dataset ${dataset} \
-        --model ARES \
-        --device cuda:0 \
-        --num_tabs ${num_tabs} \
-        --train_file mtaf_train \
-        --valid_file mtaf_valid \
-        --feature MTAF \
-        --seq_len 8000 \
-        --train_epochs 300 \
-        --batch_size 256 \
-        --learning_rate 1e-3 \
-        --optimizer AdamW \
-        --loss MultiLabelSoftMarginLoss \
-        --eval_metrics AUC P@${num_tabs} AP@${num_tabs} \
-        --save_metric AP@${num_tabs} \
-        --save_name base
+dataset=${scenario}_${num_tabs}tab
 
-      python -u exp/test.py \
+python -u exp/train.py \
+  --dataset ${dataset} \
+  --model ARES \
+  --device cuda:0 \
+  --num_tabs ${num_tabs} \
+  --train_file mtaf_train \
+  --valid_file mtaf_valid \
+  --feature MTAF \
+  --seq_len 8000 \
+  --train_epochs 300 \
+  --batch_size 256 \
+  --learning_rate 1e-3 \
+  --optimizer AdamW \
+  --loss MultiLabelSoftMarginLoss \
+  --eval_metrics AUC P@${num_tabs} AP@${num_tabs} \
+  --save_metric AP@${num_tabs} \
+  --save_name base
+
+```
+
+2. Test the model
+```sh
+scenario="closed/open"  #select the scenario of dataset open or closed
+num_tabs="2/3/4/5" #select the number of tabs
+
+dataset=${scenario}_${num_tabs}tab
+
+python -u exp/test.py \
         --dataset ${dataset} \
         --model ARES \
         --device cuda:0 \
@@ -91,9 +102,10 @@ do
         --batch_size 256 \
         --eval_metrics AUC P@${num_tabs} AP@${num_tabs} \
         --load_name base
-    done
-done
+
 ```
+
+
 
 
 ## Contact
