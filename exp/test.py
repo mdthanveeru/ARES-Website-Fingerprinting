@@ -13,9 +13,9 @@ warnings.filterwarnings("ignore")
 
 # Set a fixed seed for reproducibility
 fix_seed = 2024
-random.seed(fix_seed)
-torch.manual_seed(fix_seed)
-np.random.seed(fix_seed)
+random.seed(fix_seed)  #sets the seed for Python's built-in random module.
+torch.manual_seed(fix_seed)  #sets the seed for PyTorch's random number generator.
+np.random.seed(fix_seed)   #sets the seed for NumPy's random number generator.
 
 # Argument parser for command-line options, arguments, and sub-commands
 parser = argparse.ArgumentParser(description="WFlib")
@@ -69,11 +69,7 @@ valid_X, valid_y = data_processor.load_data(os.path.join(in_path, f"{args.valid_
 test_X, test_y = data_processor.load_data(os.path.join(in_path, f"{args.test_file}.npz"), args.feature, args.seq_len, args.num_tabs)
 num_classes = len(np.unique(test_y))
 
-if args.num_tabs == 1:
-    num_classes = len(np.unique(test_y))
-    assert num_classes == test_y.max() + 1, "Labels are not continuous" # Ensure labels are continuous
-else:
-    num_classes = test_y.shape[1]
+num_classes = test_y.shape[1]
 
 # Print dataset information
 print(f"Valid: X={valid_X.shape}, y={valid_y.shape}")
@@ -85,13 +81,10 @@ valid_iter = data_processor.load_iter(valid_X, valid_y, args.batch_size, False, 
 test_iter = data_processor.load_iter(test_X, test_y, args.batch_size, False, args.num_workers)
 
 # Initialize model, optimizer, and loss function
-if args.model in ["BAPM", "TMWF"]: # Assume num_tabs is known
-    model = eval(f"models.{args.model}")(num_classes, args.num_tabs)
-else:
-    model = eval(f"models.{args.model}")(num_classes)
-
+model = eval(f"models.{args.model}")(num_classes)
+#Loads the saved model weights from a .pth file.
 model.load_state_dict(torch.load(os.path.join(ckp_path, f"{args.load_name}.pth"), map_location="cpu"))
-model.to(device)
+model.to(device) # Move the model to the GPU
 
 # Evaluation
 model_utils.model_eval(

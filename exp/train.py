@@ -9,9 +9,9 @@ from WFlib.tools import data_processor, model_utils
 
 # Set a fixed seed for reproducibility
 fix_seed = 2024
-random.seed(fix_seed)
-torch.manual_seed(fix_seed)
-np.random.seed(fix_seed)
+random.seed(fix_seed)  #sets the seed for Python's built-in random module.
+torch.manual_seed(fix_seed)  #sets the seed for PyTorch's random number generator.
+np.random.seed(fix_seed)   #sets the seed for NumPy's random number generator.
 
 # Argument parser for command-line options, arguments, and sub-commands
 parser = argparse.ArgumentParser(description="WFlib")
@@ -87,12 +87,12 @@ print(f"num_classes: {num_classes}")
 train_iter = data_processor.load_iter(train_X, train_y, args.batch_size, True, args.num_workers)
 valid_iter = data_processor.load_iter(valid_X, valid_y, args.batch_size, False, args.num_workers)
 
-# Initialize model, optimizer, and loss function
-if args.model in ["BAPM", "TMWF"]: # Assume num_tabs is known
-    model = eval(f"models.{args.model}")(num_classes, args.num_tabs)
-else:
-    model = eval(f"models.{args.model}")(num_classes)
-optimizer = eval(f"torch.optim.{args.optimizer}")(model.parameters(), lr=args.learning_rate)
+#Initialize model, optimizer, and loss function
+model = eval(f"models.{args.model}")(num_classes) 
+#model = models.ARES(100)
+optimizer = eval(f"torch.optim.{args.optimizer}")(model.parameters(), lr=args.learning_rate)  
+#optimzer = torch.optim.AdamW(model.parameters(), lr=0.001)
+#initialize AdamW optimizer with learning rate 0.001
 
 if args.load_file is None:
     print("No pre-trained model")
@@ -109,21 +109,21 @@ else:
     log = model.load_state_dict(checkpoint, strict=False)
     assert log.missing_keys == ['fc.weight', 'fc.bias']
 
-model.to(device)
+model.to(device) # Move model to GPU
 
 # Train the model
 model_utils.model_train(
-    model, 
-    optimizer, 
-    train_iter, 
-    valid_iter, 
-    args.loss, 
-    args.save_metric, 
-    args.eval_metrics, 
-    args.train_epochs,
-    out_file,
-    num_classes,
-    args.num_tabs,
-    device,
-    args.lradj
+    model, #our model is ARES
+    optimizer, #for updating model weights(AdamW)
+    train_iter, #Training dataset (in batches).
+    valid_iter, #Validation dataset (in batches).
+    args.loss, #loss function(MultiLabelSoftMarginLoss)
+    args.save_metric, #The metric used to decide the best model (e.g., AP@2).
+    args.eval_metrics, #List of evaluation metrics (e.g., ["AUC", "P@2", "AP@2"]).
+    args.train_epochs, #Number of epochs to train.
+    out_file, #File path to save the best model.
+    num_classes, #Number of classes for classification.
+    args.num_tabs, #No. of tabs
+    device, #cpu or gpu(cuda)
+    args.lradj #Learning rate adjustment strategy.
 )

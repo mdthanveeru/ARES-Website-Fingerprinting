@@ -11,9 +11,9 @@ from WFlib.tools import data_processor
 
 # Set a fixed seed for reproducibility
 fix_seed = 2024
-random.seed(fix_seed)
-torch.manual_seed(fix_seed)
-np.random.seed(fix_seed)
+random.seed(fix_seed)  #sets the seed for Python's built-in random module.
+torch.manual_seed(fix_seed)  #sets the seed for PyTorch's random number generator.
+np.random.seed(fix_seed)   #sets the seed for NumPy's random number generator.
 
 # Argument parser for command-line options, arguments, and sub-commands
 parser = argparse.ArgumentParser(description='Feature extraction')
