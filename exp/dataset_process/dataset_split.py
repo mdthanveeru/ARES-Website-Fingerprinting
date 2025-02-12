@@ -33,12 +33,23 @@ num_classes = len(np.unique(y))
 assert num_classes == y.max() + 1, "Labels are not continuous"
 
 
-if args.use_stratify == "True":
-    X_train, X_test, y_train, y_test = train_test_split(X, y, train_size=0.9, random_state=fix_seed, stratify=y)
-    X_train, X_valid, y_train, y_valid = train_test_split(X_train, y_train, train_size=0.9, random_state=fix_seed, stratify=y_train)
-else:
-    X_train, X_test, y_train, y_test = train_test_split(X, y, train_size=0.9, random_state=fix_seed)
-    X_train, X_valid, y_train, y_valid = train_test_split(X_train, y_train, train_size=0.9, random_state=fix_seed)
+if args.use_stratify == "True":  
+    # Perform the first split: 90% train, 10% test  
+    # Stratify ensures that the label distribution in y is preserved in train and test sets  
+    X_train, X_test, y_train, y_test = train_test_split(X, y, train_size=0.9, random_state=fix_seed, stratify=y)  
+
+    # Perform the second split: 90% of train becomes actual training data, 10% becomes validation  
+    # Again, stratify ensures that the label distribution is preserved in both subsets  
+    X_train, X_valid, y_train, y_valid = train_test_split(X_train, y_train, train_size=0.9, random_state=fix_seed, stratify=y_train)  
+
+else:  
+    # Perform the first split: 90% train, 10% test  
+    # No stratification, so the split is purely random  
+    X_train, X_test, y_train, y_test = train_test_split(X, y, train_size=0.9, random_state=fix_seed)  
+
+    # Perform the second split: 90% of train becomes actual training data, 10% becomes validation  
+    # Again, no stratification, so the split is random  
+    X_train, X_valid, y_train, y_valid = train_test_split(X_train, y_train, train_size=0.9, random_state=fix_seed)  
 
 # Print dataset information
 print(f"Train: X = {X_train.shape}, y = {y_train.shape}")
