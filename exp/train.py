@@ -72,11 +72,8 @@ print(f"loading train file: ", os.path.join(in_path, f"{args.train_file}.npz"))
 train_X, train_y = data_processor.load_data(os.path.join(in_path, f"{args.train_file}.npz"), args.feature, args.seq_len, args.num_tabs)
 valid_X, valid_y = data_processor.load_data(os.path.join(in_path, f"{args.valid_file}.npz"), args.feature, args.seq_len, args.num_tabs)
 
-if args.num_tabs == 1:
-    num_classes = len(np.unique(train_y))
-    assert num_classes == train_y.max() + 1, "Labels are not continuous" # Ensure labels are continuous
-else:
-    num_classes = train_y.shape[1]
+
+num_classes = train_y.shape[1]
 
 # Print dataset information
 print(f"Train: X={train_X.shape}, y={train_y.shape}")
@@ -93,21 +90,6 @@ model = eval(f"models.{args.model}")(num_classes)
 optimizer = eval(f"torch.optim.{args.optimizer}")(model.parameters(), lr=args.learning_rate)  
 #optimzer = torch.optim.AdamW(model.parameters(), lr=0.001)
 #initialize AdamW optimizer with learning rate 0.001
-
-if args.load_file is None:
-    print("No pre-trained model")
-else:
-    print("Loading the pretrained model in ", args.load_file)
-    checkpoint = torch.load(args.load_file)
-
-    for k in list(checkpoint.keys()):
-        if k.startswith('backbone.'):
-            if k.startswith('backbone') and not k.startswith('backbone.fc'):
-                checkpoint[k[len("backbone."):]] = checkpoint[k]
-        del checkpoint[k]
-
-    log = model.load_state_dict(checkpoint, strict=False)
-    assert log.missing_keys == ['fc.weight', 'fc.bias']
 
 model.to(device) # Move model to GPU
 
