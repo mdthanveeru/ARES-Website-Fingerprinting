@@ -30,10 +30,10 @@ You can pip install if any package is missing in the environment.
 mkdir datasets
 ```
 
-- Download datasets ([link](https://zenodo.org/records/13732130)) and place it in the folder `./datasets`
+- Download datasets ([link](https://drive.google.com/drive/folders/1y3zrpXc8prPkj4QlfKBUnq0FG1FiD4mz?usp=sharing)) and place it in the folder `./datasets`
 
 
-- The extracted dataset is in npz format and contains two values: X and y. X represents the cell sequence, with values being the direction (e.g., 1 or -1) multiplied by the timestamp. y corresponds to the labels. Note that the input of some datasets consists only of direction sequences.
+- The dataset is in npz format and contains two values: X and y. X represents the cell sequence, with values being the direction (e.g., 1 or -1) multiplied by the timestamp. y corresponds to the labels.
 
 - Divide the dataset into training, validation, and test sets.
 
